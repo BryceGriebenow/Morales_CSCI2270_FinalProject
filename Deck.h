@@ -20,6 +20,7 @@ struct Player{
    int number;
    string name;
    bool ai=true;
+   bool hasAce=false;
    int sum;
    int sumHand();
    int lastSummed;

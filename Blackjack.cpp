@@ -35,12 +35,25 @@ int main(){
             d.players[i].ai=false;
         }
     }
+    d.shuffleDeck();
     d.DealCards(Players);//deals the cards
     for(int i=0;i<Players;i++){
         bool turn=true;//resets for every player
         if(!d.players[i].ai){//for a human player
             while(turn){//will stay until they bust or win or stay
-                cout<<"Player "<<i+1<<", your hand is "<<d.players[i].hand<<".\nWould you like to\n1.Hit\n2.Stay\n3.See what the other hands are"<<endl;
+                cout<<"Player "<<i+1<<", your hand is ";
+                if(d.players[i].sum==21){
+                    cout<<"Blackjack! you win!"<<endl;
+                    break;
+                }
+                int j=0;
+                while(d.players[i].hand[j]!=NULL){
+                    cout<<d.players[i].hand[j]->number<<" of "<<d.players[i].hand[j]->suit;
+                    if(d.players[i].hand[j+1]!=NULL)
+                        cout<<", ";
+                    j++;
+                }
+                cout<<", for a sum of "<<d.players[i].sum<<".\nWould you like to\n1.Hit\n2.Stay\n3.See what the other hands are"<<endl;
                 getline(cin,operation);
                 op=stoi(operation);
                 switch(op){
