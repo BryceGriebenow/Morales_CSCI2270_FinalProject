@@ -28,18 +28,19 @@ int Player::sumHand()
 			}
 			else if(hand[i]->number == 1 && !hasAce)
 			{
-			    hasAce=true;
 				if(sum > 10)
 				{
 					sum += 1;
 				}
 				else if(sum == 10)
 				{
+                    hasAce=true;
 					sum = 21;
 				}
 				else
 				{
-                    sum += 11;//There will be bugs with this. If they bust, the ace should change to mean 1.
+                    hasAce=true;
+                    sum += 11;
 				}
 			}
 			else if(hand[i]->number == 1 && hasAce)
@@ -60,7 +61,7 @@ int Player::sumHand()
 Deck::Deck(int numPlayers)
 {
 	//players[numPlayers];
-	for(int i=0;i<numPlayers;i++)
+	for(int i=0;i<numPlayers+1;i++)
 	{
 		players[i].sum =0;
 		for(int j=0; j<5; j++)
@@ -109,7 +110,7 @@ void Deck::shuffleDeck()
 
 void Deck::DealCards(int numPlayers)
 {
-	for(int i=0; i<numPlayers;i++)
+	for(int i=0; i<numPlayers+1;i++)
 	{
 		if(topCard == 52)
 		{
@@ -135,7 +136,7 @@ void Deck::DealCards(int numPlayers)
 {
 
 }*/
-bool Deck::hit(int playerInt)
+bool Deck::hit(int playerInt, int numPlayers)
 {
 	Player *p = new Player;
 	p = &players[playerInt];
@@ -153,20 +154,128 @@ bool Deck::hit(int playerInt)
 	else if(p->sumHand() == 21)
 	{
 		//win(p);
-		cout<<"YOU WIN"<<endl;
+	    won=true;
+	    if(playerInt==numPlayers)
+            cout<<"Dealer drew a ";
+		else
+            cout<<"Player "<<playerInt+1<<" drew a ";
+		printCard(p->hand[i]->number,p->hand[i]->suit);
+	    cout<<" and won!"<<endl;
 		return false;
 	}
 	else
 	{
-	    cout<<"you drew a "<<p->hand[i]->number<<" of "<<p->hand[i]->suit<<" and busted"<<endl;
+	    if(playerInt==numPlayers)
+            cout<<"Dealer drew a ";
+		else
+            cout<<"Player "<<playerInt+1<<" drew a ";
+	    printCard(p->hand[i]->number,p->hand[i]->suit);
+	    cout<<" and busted"<<endl;
+	    p->busted=true;
 		//bust(p);
 		return false;
 	}
 }
+void Deck::printCard(int number, int suit)
+{
+	switch(number){
+		case 1:
+			cout << "Ace ";
+			break;
+		case 11:
+			cout << "Jack ";
+			break;
+		case 12:
+			cout << "Queen ";
+			break;
+		case 13:
+			cout << "King ";
+			break;
+		default:
+			cout << number<<" ";
+			break;
+	}
+	cout << "of ";
 
-void Deck::peek(){}
-void Deck::declare(){}
-void Deck::dealer(){}
+	switch(suit){
+		case 0:
+			cout << "Hearts";
+			break;
+		case 1:
+			cout << "Diamonds";
+			break;
+		case 2:
+			cout << "Clubs";
+			break;
+		case 3:
+			cout << "Spades";
+			break;
+	}
+}
+void Deck::peek(int numPlayers){
+    for(int i=0;i<numPlayers+1;i++)
+	{
+		int j=0;
+		if(i==numPlayers)
+            cout<<"Dealer : ";
+        else
+            cout << "Player " << i+1 << ": ";
+		if(players[i].busted){
+            cout<<"Busted with ";
+        }
+		while(players[i].hand[j] != NULL)
+		{
+
+			if(j==0)
+			{
+				cout << "[Hidden], ";
+			}
+			else
+			{
+				printCard(players[i].hand[j]->number,players[i].hand[j]->suit);
+				if(players[i].hand[j+1] != NULL)
+					cout << ", ";
+				else
+				{
+
+					cout << endl;
+					//break;
+				}
+			}
+
+			j++;
+		}
+	}
+}
+void Deck::declare(int numPlayers){
+	int max = 0;
+	int winner = -1;
+	for(int i=0;i<numPlayers;i++)
+	{
+		if(players[i].sum > max && players[i].sum <= 21)//players[i].bust ==false)
+		{
+			max = players[i].sum;
+			winner = i;
+		}
+	}
+	if(winner == -1)
+	{
+		cout << "No one wins!" << endl;
+	}
+	else
+	{
+	    if(winner==numPlayers)
+            cout<<"Dealer wins with a sum of "<<players[winner].sum<<endl;
+		else
+            cout << "Player " << winner+1 << " wins with a sum of " << players[winner].sum << endl;
+	}
+}
+void Deck::setWon(bool winnerino){
+    won=winnerino;
+}
+bool Deck::getWon(){
+    return won;
+}
 Deck::~Deck(){}
 
 
